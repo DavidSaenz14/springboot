@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/equipos")
-@CrossOrigin("origins = "https://tfg-futbol.vercel.app"")
+@CrossOrigin("origins = "https://tfg-futbol.vercel.app")
 public class EquipoController {
 
     @Autowired
