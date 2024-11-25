@@ -3,6 +3,7 @@ package com.example.springboot.controllers;
 import com.example.springboot.models.Equipo;
 import com.example.springboot.services.EquipoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,55 +12,83 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/equipos")
-@CrossOrigin(origins = "https://tfg-futbol.vercel.app") // Reemplaza "*" por el dominio permitido
+@CrossOrigin("*")
 public class EquipoController {
 
     @Autowired
     private EquipoService equipoService;
 
-    // Obtener un equipo por ID
+    /**
+     * Obtiene un equipo por su ID.
+     *
+     * @param id ID del equipo.
+     * @return ResponseEntity con el equipo encontrado o un error.
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEquipo(@PathVariable Long id) {
+    public ResponseEntity<Equipo> getEquipo(@PathVariable Long id) {
         Optional<Equipo> equipo = equipoService.findEquipoById(id);
         if (equipo.isPresent()) {
-            return ResponseEntity.ok(equipo.get()); // Respuesta con JSON válido
+            return ResponseEntity.ok(equipo.get());  // Devuelve el equipo con un código 200
         } else {
-            return ResponseEntity.status(404).body("{\"error\":\"Equipo no encontrado\"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);  // Devuelve un código 404 si no se encuentra el equipo
         }
     }
 
-    // Obtener todos los equipos
+    /**
+     * Obtiene todos los equipos.
+     *
+     * @return ResponseEntity con la lista de equipos o un mensaje si no hay equipos.
+     */
     @GetMapping
     public ResponseEntity<List<Equipo>> getAllEquipos() {
         List<Equipo> equipos = equipoService.findAllEquipos();
-        return ResponseEntity.ok(equipos); // Respuesta con JSON válido
+        if (!equipos.isEmpty()) {
+            return ResponseEntity.ok(equipos);  // Devuelve todos los equipos con un código 200
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(null);  // Devuelve un código 204 si no hay equipos
+        }
     }
 
-    // Crear un equipo
+    /**
+     * Crea o actualiza un equipo.
+     *
+     * @param equipo Objeto Equipo a crear o actualizar.
+     * @return ResponseEntity con el equipo creado.
+     */
     @PostMapping
     public ResponseEntity<Equipo> createEquipo(@RequestBody Equipo equipo) {
-        Equipo nuevoEquipo = equipoService.saveEquipo(equipo);
-        return ResponseEntity.status(201).body(nuevoEquipo); // Respuesta con JSON válido
+        Equipo savedEquipo = equipoService.saveEquipo(equipo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEquipo);  // Devuelve el equipo creado con código 201
     }
 
-    // Actualizar un equipo por ID
+    /**
+     * Actualiza un equipo.
+     *
+     * @param id ID del equipo a actualizar.
+     * @param equipo Datos del equipo a actualizar.
+     * @return ResponseEntity con el equipo actualizado.
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEquipo(@PathVariable Long id, @RequestBody Equipo equipo) {
-        if (!equipoService.findEquipoById(id).isPresent()) {
-            return ResponseEntity.status(404).body("{\"error\":\"Equipo no encontrado\"}");
-        }
-        equipo.setId(id);
-        Equipo equipoActualizado = equipoService.saveEquipo(equipo);
-        return ResponseEntity.ok(equipoActualizado);
+    public ResponseEntity<Equipo> updateEquipo(@PathVariable Long id, @RequestBody Equipo equipo) {
+        equipo.setId(id);  // Establece el ID en el objeto equipo
+        Equipo updatedEquipo = equipoService.saveEquipo(equipo);
+        return ResponseEntity.ok(updatedEquipo);  // Devuelve el equipo actualizado con código 200
     }
 
-    // Eliminar un equipo por ID
+    /**
+     * Elimina un equipo por su ID.
+     *
+     * @param id ID del equipo a eliminar.
+     * @return ResponseEntity con el estado de la operación.
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEquipo(@PathVariable Long id) {
-        if (!equipoService.findEquipoById(id).isPresent()) {
-            return ResponseEntity.status(404).body("{\"error\":\"Equipo no encontrado\"}");
+    public ResponseEntity<Void> deleteEquipo(@PathVariable Long id) {
+        if (!equipoService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Devuelve un código 404 si no se encuentra el equipo
         }
         equipoService.deleteEquipoById(id);
-        return ResponseEntity.status(204).build(); // No content
+        return ResponseEntity.ok().build();  // Devuelve un código 200 si se elimina correctamente
     }
 }
