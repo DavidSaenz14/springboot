@@ -3,6 +3,7 @@ package com.example.springboot.controllers;
 import com.example.springboot.models.Usuarios;
 import com.example.springboot.services.UsuariosService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,33 +16,58 @@ public class UsuariosController {
     @Autowired
     private UsuariosService usuariosService;
 
-    // Método GET para listar todos los usuarios
+    // GET: listar todos los usuarios
     @GetMapping
-    public List<Usuarios> getAllUsuarios() {
-        return usuariosService.getAllUsuarios();
+    public ResponseEntity<List<Usuarios>> getAllUsuarios() {
+        List<Usuarios> usuarios = usuariosService.getAllUsuarios();
+        return ResponseEntity.ok(usuarios);
     }
 
-    // Método GET para obtener un usuario por ID
+    // GET: obtener usuario por ID
     @GetMapping("/{id}")
-    public Usuarios getUsuarioPorId(@PathVariable Long id) {
-        return usuariosService.getUsuarioPorId(id);
+    public ResponseEntity<Usuarios> getUsuarioPorId(@PathVariable Long id) {
+        try {
+            Usuarios usuario = usuariosService.getUsuarioPorId(id);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // Método POST para crear un nuevo usuario
+    // POST: crear un nuevo usuario
     @PostMapping
-    public Usuarios crearUsuario(@RequestBody Usuarios usuario) {
-        return usuariosService.crearUsuario(usuario);
+    public ResponseEntity<?> crearUsuario(@RequestBody Usuarios usuario) {
+        try {
+            Usuarios nuevoUsuario = usuariosService.crearUsuario(usuario);
+            return ResponseEntity.ok(nuevoUsuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Método PUT para actualizar un usuario existente
+    // PUT: actualizar usuario existente
     @PutMapping("/{id}")
-    public Usuarios actualizarUsuario(@PathVariable Long id, @RequestBody Usuarios usuarioActualizado) {
-        return usuariosService.actualizarUsuario(id, usuarioActualizado);
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuarios usuarioActualizado) {
+        try {
+            Usuarios actualizado = usuariosService.actualizarUsuario(id, usuarioActualizado);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Método DELETE para eliminar un usuario por ID
+    // DELETE: eliminar usuario por ID
     @DeleteMapping("/{id}")
-    public void eliminarUsuario(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuariosService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // GET opcional: verificar si existe usuario o correo
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkUserExists(@RequestParam String username, @RequestParam String email) {
+        boolean exists = usuariosService.findByNombre(username).isPresent() ||
+                usuariosService.findByCorreoElectronico(email).isPresent();
+        return ResponseEntity.ok(exists);
     }
 }

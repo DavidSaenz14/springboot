@@ -1,9 +1,6 @@
 package com.example.springboot.models;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 
 @Entity
 @Table(name = "jugadores")
@@ -31,15 +28,12 @@ public class Jugador {
     private int peso;
 
     @ManyToOne
-    @JoinColumn(name = "equipo_id")
-    @JsonIgnore
-    private Equipo equipo;
+    @JoinColumn(name = "id_equipo")
+    private Equipo equipo;  // ✅ Se serializará correctamente en JSON
 
-    // Constructor vacío necesario para JPA
-    public Jugador() {
-    }
+    // Constructor vacío
+    public Jugador() {}
 
-    // Constructor con todos los campos excepto el equipo
     public Jugador(String nombre, int edad, String posicion, String nacionalidad, int altura, int peso) {
         this.nombre = nombre;
         this.edad = edad;
@@ -49,69 +43,34 @@ public class Jugador {
         this.peso = peso;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public int getEdad() {
-        return edad;
-    }
-
-    public void setEdad(int edad) {
-        this.edad = edad;
-    }
-
-    public String getPosicion() {
-        return posicion;
-    }
-
-    public void setPosicion(String posicion) {
-        this.posicion = posicion;
-    }
-
-    public String getNacionalidad() {
-        return nacionalidad;
-    }
-
-    public void setNacionalidad(String nacionalidad) {
-        this.nacionalidad = nacionalidad;
-    }
-
-    public int getAltura() {
-        return altura;
-    }
-
-    public void setAltura(int altura) {
-        this.altura = altura;
-    }
-
-    public int getPeso() {
-        return peso;
-    }
-
-    public void setPeso(int peso) {
-        this.peso = peso;
-    }
-
-    public Equipo getEquipo() {
-        return equipo;
-    }
-
-    public void setEquipo(Equipo equipo) {
-        this.equipo = equipo;
-    }
     // Getters y setters
-}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public int getEdad() { return edad; }
+    public void setEdad(int edad) { this.edad = edad; }
+
+    public String getPosicion() { return posicion; }
+    public void setPosicion(String posicion) { this.posicion = posicion; }
+
+    public String getNacionalidad() { return nacionalidad; }
+    public void setNacionalidad(String nacionalidad) { this.nacionalidad = nacionalidad; }
+
+    public int getAltura() { return altura; }
+    public void setAltura(int altura) { this.altura = altura; }
+
+    public int getPeso() { return peso; }
+    public void setPeso(int peso) { this.peso = peso; }
+
+    public Equipo getEquipo() { return equipo; }
+    public void setEquipo(Equipo equipo) { this.equipo = equipo; }
+
+    // Para Angular
+    @Transient
+    public String getNombreEquipo() {
+        return (equipo != null) ? equipo.getNombre() : "Sin equipo";
+    }
+}

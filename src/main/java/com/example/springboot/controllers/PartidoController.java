@@ -1,6 +1,4 @@
 package com.example.springboot.controllers;
-
-
 import com.example.springboot.models.Partido;
 import com.example.springboot.services.PartidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +41,3 @@ public class PartidoController {
         partidoService.deletePartidoById(id);
     }
 }
-

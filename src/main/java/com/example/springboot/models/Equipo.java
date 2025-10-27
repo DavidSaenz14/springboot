@@ -1,8 +1,7 @@
 package com.example.springboot.models;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +12,9 @@ public class Equipo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(name = "liga")
-    private String liga;
 
     @Column(name = "entrenador")
     private String entrenador;
@@ -28,79 +25,54 @@ public class Equipo {
     @Column(name = "estadio")
     private String estadio;
 
-    @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL)
+    // Relación con jugadores
+    @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("equipo") // 👈 permite serializar equipo dentro de jugador
     private List<Jugador> jugadores;
 
-    // Constructor vacío necesario para JPA
-    public Equipo() {
-        this.jugadores = new ArrayList<>();
-    }
+    // Relación con competicion
+    @ManyToOne
+    @JoinColumn(name = "competicion_id")
+    private Competicion competicion;
 
-    // Constructor con todos los campos
+    // Constructores
+    public Equipo() { this.jugadores = new ArrayList<>(); }
+
     public Equipo(String nombre, String liga, String entrenador, int fundacionYear, String estadio) {
         this.nombre = nombre;
-        this.liga = liga;
+
         this.entrenador = entrenador;
         this.fundacionYear = fundacionYear;
         this.estadio = estadio;
         this.jugadores = new ArrayList<>();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getLiga() {
-        return liga;
-    }
-
-    public void setLiga(String liga) {
-        this.liga = liga;
-    }
-
-    public String getEntrenador() {
-        return entrenador;
-    }
-
-    public void setEntrenador(String entrenador) {
-        this.entrenador = entrenador;
-    }
-
-    public int getFundacionYear() {
-        return fundacionYear;
-    }
-
-    public void setFundacionYear(int fundacionYear) {
-        this.fundacionYear = fundacionYear;
-    }
-
-    public String getEstadio() {
-        return estadio;
-    }
-
-    public void setEstadio(String estadio) {
-        this.estadio = estadio;
-    }
-
-    public List<Jugador> getJugadores() {
-        return jugadores;
-    }
-
-    public void setJugadores(List<Jugador> jugadores) {
-        this.jugadores = jugadores;
-    }
     // Getters y setters
-}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+
+
+    public String getEntrenador() { return entrenador; }
+    public void setEntrenador(String entrenador) { this.entrenador = entrenador; }
+
+    public int getFundacionYear() { return fundacionYear; }
+    public void setFundacionYear(int fundacionYear) { this.fundacionYear = fundacionYear; }
+
+    public String getEstadio() { return estadio; }
+    public void setEstadio(String estadio) { this.estadio = estadio; }
+
+    public List<Jugador> getJugadores() { return jugadores; }
+    public void setJugadores(List<Jugador> jugadores) { this.jugadores = jugadores; }
+
+    public Competicion getCompeticion() { return competicion; }
+    public void setCompeticion(Competicion competicion) { this.competicion = competicion; }
+
+    @Transient
+    public String getNombreCompeticion() {
+        return (competicion != null) ? competicion.getNombre() : null;
+    }
+}

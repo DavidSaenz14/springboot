@@ -1,6 +1,6 @@
 package com.example.springboot.models;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,8 +10,11 @@ public class ClasificacionEquipo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Relación con Equipo en lugar de usar Long idEquipo
+    @ManyToOne
     @JoinColumn(name = "id_equipo")
-    private Long idEquipo;
+    @JsonIgnore   // 👈 Ocultamos el objeto completo en el JSON
+    private Equipo equipo;
 
     @Column(name = "posicion")
     private int posicion;
@@ -41,10 +44,10 @@ public class ClasificacionEquipo {
     public ClasificacionEquipo() {
     }
 
-    // Constructor con todos los campos
-    public ClasificacionEquipo(Long idEquipo, int posicion, int puntos, int partidosJugados, int partidosGanados,
+    // Constructor con todos los campos (ahora recibe un Equipo en lugar de idEquipo)
+    public ClasificacionEquipo(Equipo equipo, int posicion, int puntos, int partidosJugados, int partidosGanados,
                                int partidosEmpatados, int partidosPerdidos, int golesAFavor, int golesEnContra) {
-        this.idEquipo = idEquipo;
+        this.equipo = equipo;
         this.posicion = posicion;
         this.puntos = puntos;
         this.partidosJugados = partidosJugados;
@@ -63,12 +66,12 @@ public class ClasificacionEquipo {
         this.id = id;
     }
 
-    public Long getIdEquipo() {
-        return idEquipo;
+    public Equipo getEquipo() {
+        return equipo;
     }
 
-    public void setIdEquipo(Long idEquipo) {
-        this.idEquipo = idEquipo;
+    public void setEquipo(Equipo equipo) {
+        this.equipo = equipo;
     }
 
     public int getPosicion() {
@@ -134,6 +137,10 @@ public class ClasificacionEquipo {
     public void setGolesEnContra(int golesEnContra) {
         this.golesEnContra = golesEnContra;
     }
-    // Getters y setters
-}
 
+    // 👇 Getter adicional para mostrar solo el nombre del equipo en el JSON
+    @Transient
+    public String getNombreEquipo() {
+        return (equipo != null) ? equipo.getNombre() : null;
+    }
+}

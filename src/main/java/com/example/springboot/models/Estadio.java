@@ -1,6 +1,6 @@
 package com.example.springboot.models;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -24,6 +24,7 @@ public class Estadio {
 
     @ManyToOne
     @JoinColumn(name = "equipo_id")
+    @JsonIgnore   // 👈 Ocultamos el objeto Equipo en el JSON
     private Equipo equipo;
 
     // Constructor vacío necesario para JPA
@@ -31,7 +32,6 @@ public class Estadio {
     }
 
     // Constructor con todos los campos
-
     public Estadio(Long id, String nombre, String ciudad, int capacidad, String direccion, Equipo equipo) {
         this.id = id;
         this.nombre = nombre;
@@ -41,9 +41,7 @@ public class Estadio {
         this.equipo = equipo;
     }
 
-
     // Getters y setters
-
     public Long getId() {
         return id;
     }
@@ -91,5 +89,10 @@ public class Estadio {
     public void setEquipo(Equipo equipo) {
         this.equipo = equipo;
     }
-}
 
+    // 👇 Getter adicional para exponer solo el nombre del equipo
+    @Transient
+    public String getNombreEquipo() {
+        return (equipo != null) ? equipo.getNombre() : null;
+    }
+}
