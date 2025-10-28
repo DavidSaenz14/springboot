@@ -1,13 +1,15 @@
-# Imagen base con Java 17 JRE
-FROM eclipse-temurin:17-jre
+# Etapa 1: compilar con Maven
+FROM maven:3.9.3-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copiar el JAR ya compilado
-COPY target/springboot-0.0.1-SNAPSHOT.jar app.jar
+COPY pom.xml .
+COPY src ./src
 
-# Puerto que Render usará
+RUN mvn clean package -DskipTests
+
+# Etapa 2: solo JRE
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENV PORT=8080
-
-# Ejecutar la app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
