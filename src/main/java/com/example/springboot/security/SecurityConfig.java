@@ -85,7 +85,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://tfg-futbol-prueba-e2x5.vercel.app")); // origen de Angular
+        configuration.setAllowedOrigins(Arrays.asList("https://tfg-futbol-prueba-6im6.vercel.app")); // origen de Angular
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
