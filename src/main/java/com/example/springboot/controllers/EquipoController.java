@@ -27,20 +27,20 @@ public class EquipoController {
         return equipoService.findAllEquipos();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")  // Solo ADMIN puede crear
+   
     @PostMapping
     public Equipo createEquipo(@RequestBody Equipo equipo) {
         return equipoService.saveEquipo(equipo);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")  // Solo ADMIN puede actualizar
+    
     @PutMapping("/{id}")
     public Equipo updateEquipo(@PathVariable Long id, @RequestBody Equipo equipo) {
         equipo.setId(id);
         return equipoService.saveEquipo(equipo);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")  // Solo ADMIN puede borrar
+    
     @DeleteMapping("/{id}")
     public void deleteEquipo(@PathVariable Long id) {
         equipoService.deleteEquipoById(id);
